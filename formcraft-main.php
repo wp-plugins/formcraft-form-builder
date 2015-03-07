@@ -70,13 +70,13 @@ function formcraft_basic_redirect_to_form_page()
 		{
 			add_action('wp_head','formcraft_basic_wp_head');
 			wp_head();
-			$qry = $wpdb->get_var( "SELECT html, name FROM $forms_table WHERE id='$form_id'" );
+			$qry = $wpdb->get_var( "SELECT html FROM $forms_table WHERE id='$form_id'" );
 			echo "<style>html{margin-top:0px!important;}</style><div id='form-cover' class='formcraft-css' style='padding: 50px 15px'>";
 			if (strpos($_SERVER["REQUEST_URI"], '?preview=true'))
 			{
 				echo "<span class='form-preview'>".__('Preview Mode','formcraft_basic')."</span>";
 			}
-			echo stripcslashes($qry);
+			echo stripslashes($qry);
 			echo "</div>";
 			die();
 		}
@@ -735,7 +735,7 @@ function formcraft_basic_check()
 		}
 		$builder = $_POST['builder'];
 		$meta_builder = esc_sql(stripslashes($_POST['meta_builder']));
-		$html = esc_sql($_POST['html']);
+		$html = esc_sql(stripslashes($_POST['html']));
 		$html = formcraft_basic_replace_comments('<!--RFH-->','<!--RTH-->',$html,'');
 		if ( $builder != esc_sql($builder) )
 		{
