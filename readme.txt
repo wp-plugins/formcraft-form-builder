@@ -14,7 +14,7 @@ Create gorgeous forms for your site using this drag-and-drop form builder.
 FormCraft is a drag-and-drop form builder to create and embed forms, and track submissions. Our WYSIWYG form builder is fast, easy-to-use and offers extensive customization.
 
 ### Create Awesome Forms
-Forms don't have to look ugly anymore. We have spent a lot of time on our form builder platform to make sure all the forms made with FormCraft form builder are as stylish and beautiful as your website. All our forms are responsive to all devices, by default. FormCraft form builder is a great alternate to other form builders like Contact Form 7
+Forms don't have to look ugly anymore. We have spent a lot of time on our form builder platform to make sure all the forms made with FormCraft form builder are as stylish and beautiful as your website. All our forms are responsive on all devices, by default. FormCraft form builder is a great alternate to other form builders like Contact Form 7
 
 ### Examples
 FormCraft can be used to make a variety of forms, like contact form, support form, application form, etc ...
@@ -29,10 +29,11 @@ FormCraft is based on our 4th Gen form building platform, which is a complete re
 2. Responsive forms
 3. Support for 8 fields types, including custom HTML
 4. Embed forms using shortcode in your site
-5. Get live email notifications of form submissions
+5. Get live email notifications on form submissions
 6. Export / Import form templates
 7. Lightweight and fast
-8. Translation-ready
+8. Form validation
+9. Translation-ready
 
 
 ### Support & FeedBack
@@ -61,7 +62,7 @@ Try out [FormCraft Premium Form Builder](http://codecanyon.net/item/formcraft-pr
 == Frequently Asked Questions ==
 
 ### Why should I use FormCraft form builder over other form builders?
-Our drag-and-drop form builder is fast and easy to use, and allows for extensive customization, without being too complex. But the best part is that forms made with our form builder look gorgeous, and are responsive to all devices. We use AJAX for submitting form data, which improves the user experience, and means no page refreshes.
+Our drag-and-drop form builder is fast and easy to use, and allows for extensive customization, without being too complex. But the best part is that forms made with our form builder look gorgeous, and are responsive on all devices. We use AJAX for submitting form data, which improves the user experience, and means no page refreshes.
 
 ### Where is my data saved?
 All the data is saved on your server.
