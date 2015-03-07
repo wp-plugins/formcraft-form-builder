@@ -145,8 +145,8 @@ function formcraft_basic_form_styles()
 	{
 		if(formcraft_basic_check_form_page_access($form_id))
 		{
-		formcraft_basic_new_view(formcraft_basic_check_form_page());
-		status_header( 200 );
+			formcraft_basic_new_view(formcraft_basic_check_form_page());
+			status_header( 200 );
 		}
 	}
 	wp_enqueue_style('fcb-main-css', plugins_url( 'assets/css/form.main.css', __FILE__ ),array(), $fcb_version);
@@ -542,8 +542,15 @@ function formcraft_basic_check()
 		$errors = array();
 		$response = array();
 		foreach ($meta['fields'] as $key => $field) {
+
+			$value = isset($_POST[$field['identifier']]) ? $_POST[$field['identifier']] : '';
+
+			/* Check if Required Field */
+			if ( isset($field['elementDefaults']['required']) && $field['elementDefaults']['required']==true && trim($value)=='' )
+			{
+				$errors['errors'][$field['identifier']] = __('Required','formcraft_basic');
+			}
 			if ( !isset($_POST[$field['identifier']]) ) { continue; }
-			$value = $_POST[$field['identifier']];
 			
 			/* Field Type Validation */
 			switch ($field['type']) {
@@ -600,12 +607,6 @@ function formcraft_basic_check()
 						break;
 					}
 				}
-			}
-
-			/* Check if Required Field */
-			if ( isset($field['elementDefaults']['required']) && $field['elementDefaults']['required']==true && trim($value)=='' )
-			{
-				$errors['errors'][$field['identifier']] = __('Required','formcraft_basic');
 			}
 
 		} /* End of Fields Loop */
