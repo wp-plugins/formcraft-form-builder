@@ -14,7 +14,7 @@ Create gorgeous forms for your site using this drag-and-drop form builder.
 FormCraft is a drag-and-drop form builder to create and embed forms, and track submissions. Our WYSIWYG form builder is fast, easy-to-use and offers extensive customization.
 
 ### Create Awesome Forms
-Forms don't have to look ugly anymore. We have spent a lot of time on our form builder platform to make sure all the forms made with FormCraft form builder are as stylish and beautiful as your website. All our forms are responsive to all devices, by default. FormCraft form builder is a great alternate to other form builders like contact form 7
+Forms don't have to look ugly anymore. We have spent a lot of time on our form builder platform to make sure all the forms made with FormCraft form builder are as stylish and beautiful as your website. All our forms are responsive to all devices, by default. FormCraft form builder is a great alternate to other form builders like Contact Form 7
 
 ### Examples
 FormCraft can be used to make a variety of forms, like contact form, support form, application form, etc ...
@@ -37,6 +37,25 @@ FormCraft is based on our 4th Gen form building platform, which is a complete re
 
 ### Support & FeedBack
 If you like FormCraft form builder, please give us a rating! If you have any support issues, or need any help with the form builder, you can use the forum. We are constantly striving to improve our form builder platform, and your feedback is most valuable.
+
+
+### FormCraft Premium
+If you like FormCraft Basic, you might want to give our premium offering a try. Additional features in FormCraft Premium Form Builder are:
+
+1. Conditional Logic
+2. Math logic for making order forms, quizzes
+3. Auto-save form progress
+4. Over 20+ form fields, including special fields like star rating, sliders, emoticon rating, matrix, etc ...
+5. Accept multiple files uploads using the forms
+6. Integrations for popular services like MailChimp, GetResponse, Campaign Monitor, Aweber
+7. Embed popup forms, fly-in forms, or sticky-button forms on your site
+8. Download form templates from our online form template gallery
+9. Export all your submissions to CSV, or spreadsheet format
+10. Send customized auto-responders to your users
+11. Get form analytics in your WordPress dashboard
+12. Comprehensive online documentation, and one-on-one support
+
+Try out [FormCraft Premium Form Builder](http://codecanyon.net/item/formcraft-premium-wordpress-form-builder/5335056?ref=ncrafts)
 
 
 == Frequently Asked Questions ==
