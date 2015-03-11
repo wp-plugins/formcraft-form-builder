@@ -6,12 +6,13 @@
 	Description: A beautiful and simple drag-and-drop WordPress form builder
 	Author: Nishant
 	Author URI: https://twitter.com/nish_crafts
-	Version: 1.0
+	Version: 1.0.1
 	Text Domain: formcraft_basic
 	*/
 
-	global $fcb_version, $forms_table, $submissions_table, $views_table, $wpdb;
-	$fcb_version = 1.1;
+	global $fcb_meta, $forms_table, $submissions_table, $views_table, $wpdb;
+	$fcb_meta['version'] = 1;
+	$fcb_meta['user_can'] = 'activate_plugins';
 	$forms_table = $wpdb->prefix . "formcraft_b_forms";
 	$submissions_table = $wpdb->prefix . "formcraft_b_submissions";
 	$views_table = $wpdb->prefix . "formcraft_b_views";
@@ -21,103 +22,84 @@
 	*/
 	function formcraft_basic_activate()
 	{
-		global $fcb_version, $forms_table, $submissions_table, $views_table, $wpdb;
+		global $fcb_meta, $forms_table, $submissions_table, $views_table, $wpdb;
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		$charset_collate = $wpdb->get_charset_collate();
-		$sql = "CREATE TABLE $forms_table (
-			id mediumint(9) NOT NULL AUTO_INCREMENT,
-			counter INT NOT NULL,
-			name tinytext NOT NULL,
-			created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-			modified datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-			html MEDIUMTEXT NULL,
-			builder MEDIUMTEXT NULL,
-			meta_builder MEDIUMTEXT NULL,
-			UNIQUE KEY id (id)
-			) $charset_collate;";
-dbDelta( $sql );
-$sql = "CREATE TABLE $submissions_table (
-	id mediumint(9) NOT NULL AUTO_INCREMENT,
-	form INT NOT NULL,
-	form_name tinytext NOT NULL,
-	created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-	content MEDIUMTEXT NULL,
-	visitor MEDIUMTEXT NULL,
-	UNIQUE KEY id (id)
-	) $charset_collate;";
-dbDelta( $sql );
-$sql = "CREATE TABLE $views_table (
-	id mediumint(9) NOT NULL AUTO_INCREMENT,
-	form INT NOT NULL,
-	views INT NOT NULL,
-	views_date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-	UNIQUE KEY id (id)
-	) $charset_collate;";
-dbDelta( $sql );
-}
-register_activation_hook( __FILE__, 'formcraft_basic_activate' );
+		$sql = "CREATE TABLE $forms_table (id mediumint(9) NOT NULL AUTO_INCREMENT,counter INT NOT NULL,name tinytext NOT NULL,created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,modified datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,html MEDIUMTEXT NULL,builder MEDIUMTEXT NULL,meta_builder MEDIUMTEXT NULL,UNIQUE KEY id (id)) $charset_collate;";
+		dbDelta( $sql );
+		$sql = "CREATE TABLE $submissions_table (id mediumint(9) NOT NULL AUTO_INCREMENT,form INT NOT NULL,form_name tinytext NOT NULL,created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,content MEDIUMTEXT NULL,visitor MEDIUMTEXT NULL,UNIQUE KEY id (id)) $charset_collate;";
+		dbDelta( $sql );
+		$sql = "CREATE TABLE $views_table (id mediumint(9) NOT NULL AUTO_INCREMENT,form INT NOT NULL,views INT NOT NULL,views_date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,UNIQUE KEY id (id)) $charset_collate;";
+		dbDelta( $sql );
+	}
+	register_activation_hook( __FILE__, 'formcraft_basic_activate' );
 
 
-/* Check if the User is Visiting a Form Page */
-add_action('template_redirect', 'formcraft_basic_redirect_to_form_page', 1);
-function formcraft_basic_redirect_to_form_page()
-{
-	global $fcb_version, $forms_table, $wpdb;
-	if(formcraft_basic_check_form_page())
+	/* Check if the User is Visiting a Form Page */
+	add_action('template_redirect', 'formcraft_basic_redirect_to_form_page', 1);
+	function formcraft_basic_redirect_to_form_page()
 	{
-		$form_id = formcraft_basic_check_form_page();
-		if(formcraft_basic_check_form_page_access($form_id))
+		global $fcb_meta, $forms_table, $wpdb;
+		if(formcraft_basic_check_form_page())
 		{
-			add_action('wp_head','formcraft_basic_wp_head');
-			wp_head();
-			$qry = $wpdb->get_var( "SELECT html FROM $forms_table WHERE id='$form_id'" );
-			echo "<style>html{margin-top:0px!important;}</style><div id='form-cover' class='formcraft-css' style='padding: 50px 15px'>";
-			if (strpos($_SERVER["REQUEST_URI"], '?preview=true'))
+			$form_id = formcraft_basic_check_form_page();
+			if(formcraft_basic_check_form_page_access($form_id))
 			{
-				echo "<span class='form-preview'>".__('Preview Mode','formcraft_basic')."</span>";
+				add_action('wp_head','formcraft_basic_wp_head');
+				wp_head();
+				$qry = $wpdb->get_var( "SELECT html FROM $forms_table WHERE id='$form_id'" );
+				echo "<style>html{margin-top:0px!important;}</style><div id='form-cover' class='formcraft-css' style='padding: 50px 15px'>";
+				if (strpos($_SERVER["REQUEST_URI"], '?preview=true'))
+				{
+					echo "<span class='form-preview'>".__('Preview Mode','formcraft_basic')."</span>";
+				}
+				echo stripslashes($qry);
+				echo "</div>";
+				die();
 			}
-			echo stripslashes($qry);
-			echo "</div>";
-			die();
 		}
 	}
-}
-function formcraft_basic_wp_head()
-{
-	global $fcb_version, $forms_table, $wpdb;
-	$url = explode('/',str_replace('?preview=true', '', $_SERVER["REQUEST_URI"]));
-	$form_id = $url[ (count($url)-1) ];
-	$qry = $wpdb->get_var( "SELECT name FROM $forms_table WHERE id='$form_id'" );
-	echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
-	echo '<title>'.get_bloginfo('name').' - '.$qry.'</title>';
-}
+	function formcraft_basic_wp_head()
+	{
+		global $fcb_meta, $forms_table, $wpdb;
+		$url = explode('/',str_replace('?preview=true', '', $_SERVER["REQUEST_URI"]));
+		$form_id = $url[ (count($url)-1) ];
+		$qry = $wpdb->get_var( "SELECT name FROM $forms_table WHERE id='$form_id'" );
+		echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
+		echo '<title>'.get_bloginfo('name').' - '.$qry.'</title>';
+	}
 
-function formcraft_basic_check_form_page()
-{
-	global $fcb_version, $forms_table, $wpdb;
-	$url = explode('/',str_replace('?preview=true', '', $_SERVER["REQUEST_URI"]));
-	if ( $url[ (count($url)-2) ]=='form' && ctype_digit($url[ (count($url)-1) ]) )
+	function formcraft_basic_check_form_page()
 	{
-		return $url[ (count($url)-1) ];
-	}
-	else
-	{
-		return false;
-	}
-}
-/* Check if current requester is allowed form page access */
-function formcraft_basic_check_form_page_access($form_id)
-{
-	global $fcb_version, $forms_table, $wpdb;
-	$qry = $wpdb->get_var( "SELECT meta_builder FROM $forms_table WHERE id='$form_id'" );
-	$qry = json_decode(stripslashes($qry),1);
-	if(isset($qry['config']) && isset($qry['config']['disable_form_link']) && $qry['config']['disable_form_link']==true)
-	{
-		if (is_user_logged_in())
+		global $fcb_meta, $forms_table, $wpdb;
+		$url = explode('/',str_replace('?preview=true', '', $_SERVER["REQUEST_URI"]));
+		if ( $url[ (count($url)-2) ]=='form' && ctype_digit($url[ (count($url)-1) ]) )
 		{
-			if (isset($_GET['preview']) && $_GET['preview']==true)
+			return $url[ (count($url)-1) ];
+		}
+		else
+		{
+			return false;
+		}
+	}
+	/* Check if current requester is allowed form page access */
+	function formcraft_basic_check_form_page_access($form_id)
+	{
+		global $fcb_meta, $forms_table, $wpdb;
+		$qry = $wpdb->get_var( "SELECT meta_builder FROM $forms_table WHERE id='$form_id'" );
+		$qry = json_decode(stripslashes($qry),1);
+		if(isset($qry['config']) && isset($qry['config']['disable_form_link']) && $qry['config']['disable_form_link']==true)
+		{
+			if (is_user_logged_in())
 			{
-				return true;
+				if (isset($_GET['preview']) && $_GET['preview']==true)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			}
 			else
 			{
@@ -126,204 +108,199 @@ function formcraft_basic_check_form_page_access($form_id)
 		}
 		else
 		{
-			return false;
+			return true;
 		}
 	}
-	else
-	{
-		return true;
-	}
-}
 
-/* Enqueue Styles on Front End Pages, Header */
-add_action( 'wp_enqueue_scripts', 'formcraft_basic_form_styles' );
-function formcraft_basic_form_styles()
-{
-	global $fcb_version, $forms_table, $wpdb;
-	$form_id = formcraft_basic_check_form_page();
-	if($form_id)
+	/* Enqueue Styles on Front End Pages, Header */
+	add_action( 'wp_enqueue_scripts', 'formcraft_basic_form_styles' );
+	function formcraft_basic_form_styles()
 	{
-		if(formcraft_basic_check_form_page_access($form_id))
+		global $fcb_meta, $forms_table, $wpdb;
+		$form_id = formcraft_basic_check_form_page();
+		if($form_id)
 		{
-			formcraft_basic_new_view(formcraft_basic_check_form_page());
-			status_header( 200 );
-		}
-	}
-	wp_enqueue_style('fcb-main-css', plugins_url( 'assets/css/form.main.css', __FILE__ ),array(), $fcb_version);
-	wp_enqueue_style('fcb-common-css', plugins_url( 'assets/css/common-elements.css', __FILE__ ),array(), $fcb_version);
-	wp_enqueue_style('fcb-fontello-css', plugins_url( 'assets/fontello/css/fcb.css', __FILE__ ),array(), $fcb_version);
-	wp_enqueue_style('fcb-fontello-animation-css', plugins_url( 'assets/fontello/css/animation.css', __FILE__ ),array(), $fcb_version);
-}
-
-/* Custom Add Form Button for the WP Editor */
-add_action( 'media_buttons', 'formcraft_basic_custom_button');
-function formcraft_basic_custom_button( ) {
-	global $fcb_version, $forms_table, $wpdb;
-	if ( !current_user_can('edit_posts') || !current_user_can('edit_pages') ) { return; }
-	$button = '<a href="javascript:void(0);" id="fcb_afb" class="button" title="'.__('Insert FormCraft Basic Form','formcraft_basic').'" data-target="#fcb_add_form_modal" data-toggle="fcbmodal"><img style="padding-left:2px" width="12" src="'.plugins_url( 'assets/images/plus.png', __FILE__ ).'"/>' .__( 'Add Form', 'formcraft_basic' ). '</a>';
-	add_action('admin_footer','formcraft_basic_add_modal');
-	wp_enqueue_style('fcb-fontello-css', plugins_url( 'assets/fontello/css/fcb.css', __FILE__ ),array(), $fcb_version);  
-	wp_enqueue_style('fcb-common-css', plugins_url( 'assets/css/common-elements.css', __FILE__ ),array(), $fcb_version);  
-	wp_enqueue_style('fcb-modal-css', plugins_url( 'assets/css/fcbmodal.css', __FILE__ ),array(), $fcb_version);
-	wp_enqueue_script('fcb-modal-js', plugins_url( 'assets/js/fcbmodal.js', __FILE__ ));
-	wp_enqueue_script('fcb-add-form-button-js', plugins_url( 'assets/js/add-form-button.js', __FILE__ ));
-	wp_enqueue_style('fcb-add-form-button-css', plugins_url( 'assets/css/add-form-button.css', __FILE__ ),array(), $fcb_version);
-	echo $button;
-}
-function formcraft_basic_add_modal()
-{
-	global $fcb_version, $forms_table, $wpdb;
-	$forms = $wpdb->get_results( "SELECT id,name FROM $forms_table", ARRAY_A );
-	echo '<div class="fcbmodal formcraft-css fcbfade" id="fcb_add_form_modal"><form class="fcbmodal-dialog" style="width: 300px"><div class="fcbmodal-content">';
-	echo '<div class="fcbmodal-header">'.__('FormCraft Basic','formcraft_basic').'<button class="fcbclose" type="button" class="close" data-dismiss="fcbmodal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';	
-	echo '<div class="fcbmodal-body">';
-	if ( count($forms)!=0 )
-	{
-		echo "<div class='fcb-modal-head'>".__('Select Form','formcraft_basic')."</div>";
-		foreach ($forms as $key => $value) {
-			echo "<label class='select-form'><input ".($key==0?"checked ":"")."type='radio' value='".$value['id']."' name='fcb_form_id'/>".$value['name']."</label>";
-		}
-		echo "<br><div class='fcb-modal-head'>".__('Select Alignment','formcraft_basic')."</div>";
-		echo "<label class='select-alignment'><input checked type='radio' value='left' name='fcb_form_align'/>".__('Left','formcraft_basic')."</label>";
-		echo "<label class='select-alignment'><input type='radio' value='center' name='fcb_form_align'/>".__('Center','formcraft_basic')."</label>";
-		echo "<label class='select-alignment'><input type='radio' value='right' name='fcb_form_align'/>".__('Right','formcraft_basic')."</label>";
-	}
-	else
-	{
-		echo "<center style='letter-spacing:0'>".__("You have no forms","formcraft_basic")."</center>";
-	}
-	echo '</div>';
-	if ( count($forms)!=0 )
-	{
-		echo '<div class="fcbmodal-footer"><button type="submit" class="button" id="fcb_add_form_to_editor">'.__('Add Form','formcraft_basic').'</button></div>';
-	}
-	echo '</div></form></div>';
-}
-
-
-/* Register a Form View */
-function formcraft_basic_new_view($form_id)
-{
-	global $fcb_version, $forms_table, $submissions_table, $views_table, $wpdb;
-	if ( !strpos($_SERVER["REQUEST_URI"], '?preview=true') && ctype_digit($form_id))
-	{
-		if(!isset($_COOKIE["fcb_".$form_id])) {
-			/* 30 min window for counting another view by same user */
-			setcookie("fcb_".$form_id, true, time()+1800, '/');
-			$time = date('Y-m-d 00:00:00',time()+fcb_offset());
-			if($wpdb->get_var( "SELECT COUNT(*) FROM $views_table WHERE views_date = '$time' AND form = $form_id" ))
+			if(formcraft_basic_check_form_page_access($form_id))
 			{
-				$existing = $wpdb->get_var( "SELECT views FROM $views_table WHERE views_date = '$time' AND form = $form_id" );
-				$wpdb->update($views_table, array( 'views' => $existing+1 ), array('form'=>$form_id,'views_date'=>$time));
-			}
-			else
-			{
-				$rows_affected = $wpdb->insert( $views_table, array( 
-					'form' => $form_id,
-					'views' => 1,
-					'views_date' => $time
-					) );
+				formcraft_basic_new_view(formcraft_basic_check_form_page());
+				status_header( 200 );
 			}
 		}
+		wp_enqueue_style('fcb-main-css', plugins_url( 'assets/css/form.main.css', __FILE__ ),array(), $fcb_meta['version']);
+		wp_enqueue_style('fcb-common-css', plugins_url( 'assets/css/common-elements.css', __FILE__ ),array(), $fcb_meta['version']);
+		wp_enqueue_style('fcb-fontello-css', plugins_url( 'assets/fontello/css/fcb.css', __FILE__ ),array(), $fcb_meta['version']);
+		wp_enqueue_style('fcb-fontello-animation-css', plugins_url( 'assets/fontello/css/animation.css', __FILE__ ),array(), $fcb_meta['version']);
 	}
-}
 
-
-/* Create a Custom Title for the Form Page */
-function formcraft_basic_modify_title($title, $sep)
-{
-	global $fcb_version, $forms_table, $wpdb;
-	$url = explode('/',str_replace('?preview=true', '', $_SERVER["REQUEST_URI"]));
-	$form_id = $url[ (count($url)-1) ];
-	$qry = $wpdb->get_var( "SELECT name FROM $forms_table WHERE id='$form_id'" );
-	return $sep." ".$qry;
-}
-
-/* Enqueue Scripts / Styles if the user is visiting the Form Page */
-add_action('init','formcraft_basic_check');
-function formcraft_basic_check()
-{
-	global $fcb_version, $forms_table, $submissions_table, $views_table, $wpdb;
-	if (is_user_logged_in() && isset($_GET['formcraft_export_form']) && ctype_digit($_GET['formcraft_export_form']) )
-	{
-		$form_id = $_GET['formcraft_export_form'];
-		$data = $wpdb->get_row( "SELECT * FROM $forms_table WHERE id = '$form_id'", ARRAY_A );
-		$result = array();
-		$result['plugin'] = 'FormCraft Basic';
-		$result['created'] = date('Y-m-d H:i:s',time());
-		$result['html'] = base64_encode(stripslashes($data['html']));
-		$result['builder'] = base64_encode(stripslashes($data['builder']));
-		$result['meta_builder'] = base64_encode(stripslashes($data['meta_builder']));
-		$result = json_encode($result);
-
-		header("Content-Type: text/plain");
-		header('Content-Disposition: attachment; filename="'.$data['name'].'.txt"');
-		header("Pragma: no-cache");
-		header("Expires: 0");
-
-		print $result;
-		die();
+	/* Custom Add Form Button for the WP Editor */
+	add_action( 'media_buttons', 'formcraft_basic_custom_button');
+	function formcraft_basic_custom_button( ) {
+		global $fcb_meta, $forms_table, $wpdb;
+		if ( !current_user_can('edit_posts') || !current_user_can('edit_pages') ) { return; }
+		$button = '<a href="javascript:void(0);" id="fcb_afb" class="button" title="'.__('Insert FormCraft Basic Form','formcraft_basic').'" data-target="#fcb_add_form_modal" data-toggle="fcbmodal"><img style="padding-left:2px" width="12" src="'.plugins_url( 'assets/images/plus.png', __FILE__ ).'"/>' .__( 'Add Form', 'formcraft_basic' ). '</a>';
+		add_action('admin_footer','formcraft_basic_add_modal');
+		wp_enqueue_style('fcb-fontello-css', plugins_url( 'assets/fontello/css/fcb.css', __FILE__ ),array(), $fcb_meta['version']);  
+		wp_enqueue_style('fcb-common-css', plugins_url( 'assets/css/common-elements.css', __FILE__ ),array(), $fcb_meta['version']);  
+		wp_enqueue_style('fcb-modal-css', plugins_url( 'assets/css/fcbmodal.css', __FILE__ ),array(), $fcb_meta['version']);
+		wp_enqueue_script('fcb-modal-js', plugins_url( 'assets/js/fcbmodal.js', __FILE__ ));
+		wp_enqueue_script('fcb-add-form-button-js', plugins_url( 'assets/js/add-form-button.js', __FILE__ ));
+		wp_enqueue_style('fcb-add-form-button-css', plugins_url( 'assets/css/add-form-button.css', __FILE__ ),array(), $fcb_meta['version']);
+		echo $button;
 	}
-	$form_id = formcraft_basic_check_form_page();
-	if($form_id)
+	function formcraft_basic_add_modal()
 	{
-		add_filter( 'wp_title', 'formcraft_basic_modify_title', 1, 2 );
-		wp_enqueue_script('fcb-tooltip-js', plugins_url( 'assets/js/tooltip.min.js', __FILE__ ), array('jquery')); 
-		wp_enqueue_script('fcb-form-js', plugins_url( 'assets/js/form.js', __FILE__ ), array('jquery', 'jquery-ui-core', 'jquery-ui-datepicker'), $fcb_version); 
-		wp_enqueue_script('fcb-validation-js', plugins_url( 'assets/js/formcraft-validation.js', __FILE__ )); 
-		wp_localize_script( 'fcb-validation-js', 'FCB_validation',
-			array( 
-				'is_required' => __('Required','formcraft_basic'),
-				'min_char' => __('Min [min] characters required','formcraft_basic'),
-				'max_char' => __('Max [max] characters allowed','formcraft_basic'),
-				'allow_email' => __('Invalid email','formcraft_basic'),
-				'allow_alphabets' => __('Only alphabets allowed','formcraft_basic'),
-				'allow_numbers' => __('Only numbers allowed','formcraft_basic'),
-				'allow_alphanumeric' => __('Only alphabets and numbers allowed','formcraft_basic'),
-				)
-			);		wp_localize_script( 'fcb-form-js', 'FCB',
-			array( 
-				'ajaxurl' => admin_url( 'admin-ajax.php' ),
-				'datepickerLang' => plugins_url( 'assets/js/datepicker-lang/', __FILE__ )
-				)
-			);
+		global $fcb_meta, $forms_table, $wpdb;
+		$forms = $wpdb->get_results( "SELECT id,name FROM $forms_table", ARRAY_A );
+		echo '<div class="fcbmodal formcraft-css fcbfade" id="fcb_add_form_modal"><form class="fcbmodal-dialog" style="width: 300px"><div class="fcbmodal-content">';
+		echo '<div class="fcbmodal-header">'.__('FormCraft Basic','formcraft_basic').'<button class="fcbclose" type="button" class="close" data-dismiss="fcbmodal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';	
+		echo '<div class="fcbmodal-body">';
+		if ( count($forms)!=0 )
+		{
+			echo "<div class='fcb-modal-head'>".__('Select Form','formcraft_basic')."</div>";
+			foreach ($forms as $key => $value) {
+				echo "<label class='select-form'><input ".($key==0?"checked ":"")."type='radio' value='".$value['id']."' name='fcb_form_id'/>".$value['name']."</label>";
+			}
+			echo "<br><div class='fcb-modal-head'>".__('Select Alignment','formcraft_basic')."</div>";
+			echo "<label class='select-alignment'><input checked type='radio' value='left' name='fcb_form_align'/>".__('Left','formcraft_basic')."</label>";
+			echo "<label class='select-alignment'><input type='radio' value='center' name='fcb_form_align'/>".__('Center','formcraft_basic')."</label>";
+			echo "<label class='select-alignment'><input type='radio' value='right' name='fcb_form_align'/>".__('Right','formcraft_basic')."</label>";
+		}
+		else
+		{
+			echo "<center style='letter-spacing:0'>".__("You have no forms","formcraft_basic")."</center>";
+		}
+		echo '</div>';
+		if ( count($forms)!=0 )
+		{
+			echo '<div class="fcbmodal-footer"><button type="submit" class="button" id="fcb_add_form_to_editor">'.__('Add Form','formcraft_basic').'</button></div>';
+		}
+		echo '</div></form></div>';
+	}
+
+
+	/* Register a Form View */
+	function formcraft_basic_new_view($form_id)
+	{
+		global $fcb_meta, $forms_table, $submissions_table, $views_table, $wpdb;
+		if ( !strpos($_SERVER["REQUEST_URI"], '?preview=true') && ctype_digit($form_id))
+		{
+			if(!isset($_COOKIE["fcb_".$form_id])) {
+				/* 30 min window for counting another view by same user */
+				setcookie("fcb_".$form_id, true, time()+1800, '/');
+				$time = date('Y-m-d 00:00:00',time()+fcb_offset());
+				if($wpdb->get_var( "SELECT COUNT(*) FROM $views_table WHERE views_date = '$time' AND form = $form_id" ))
+				{
+					$existing = $wpdb->get_var( "SELECT views FROM $views_table WHERE views_date = '$time' AND form = $form_id" );
+					$wpdb->update($views_table, array( 'views' => $existing+1 ), array('form'=>$form_id,'views_date'=>$time));
+				}
+				else
+				{
+					$rows_affected = $wpdb->insert( $views_table, array( 
+						'form' => $form_id,
+						'views' => 1,
+						'views_date' => $time
+						) );
+				}
+			}
+		}
+	}
+
+
+	/* Create a Custom Title for the Form Page */
+	function formcraft_basic_modify_title($title, $sep)
+	{
+		global $fcb_meta, $forms_table, $wpdb;
+		$url = explode('/',str_replace('?preview=true', '', $_SERVER["REQUEST_URI"]));
+		$form_id = $url[ (count($url)-1) ];
+		$qry = $wpdb->get_var( "SELECT name FROM $forms_table WHERE id='$form_id'" );
+		return $sep." ".$qry;
+	}
+
+	/* Enqueue Scripts / Styles if the user is visiting the Form Page */
+	add_action('init','formcraft_basic_check');
+	function formcraft_basic_check()
+	{
+		global $fcb_meta, $forms_table, $submissions_table, $views_table, $wpdb;
+		if (is_user_logged_in() && isset($_GET['formcraft_export_form']) && ctype_digit($_GET['formcraft_export_form']) )
+		{
+			$form_id = $_GET['formcraft_export_form'];
+			$data = $wpdb->get_row( "SELECT * FROM $forms_table WHERE id = '$form_id'", ARRAY_A );
+			$result = array();
+			$result['plugin'] = 'FormCraft Basic';
+			$result['created'] = date('Y-m-d H:i:s',time());
+			$result['html'] = base64_encode(stripslashes($data['html']));
+			$result['builder'] = base64_encode(stripslashes($data['builder']));
+			$result['meta_builder'] = base64_encode(stripslashes($data['meta_builder']));
+			$result = json_encode($result);
+
+			header("Content-Type: text/plain");
+			header('Content-Disposition: attachment; filename="'.$data['name'].'.txt"');
+			header("Pragma: no-cache");
+			header("Expires: 0");
+
+			print $result;
+			die();
+		}
+		$form_id = formcraft_basic_check_form_page();
+		if($form_id)
+		{
+			add_filter( 'wp_title', 'formcraft_basic_modify_title', 1, 2 );
+			wp_enqueue_script('fcb-tooltip-js', plugins_url( 'assets/js/tooltip.min.js', __FILE__ ), array('jquery')); 
+			wp_enqueue_script('fcb-form-js', plugins_url( 'assets/js/form.js', __FILE__ ), array('jquery', 'jquery-ui-core', 'jquery-ui-datepicker'), $fcb_meta['version']); 
+			wp_enqueue_script('fcb-validation-js', plugins_url( 'assets/js/formcraft-validation.js', __FILE__ )); 
+			wp_localize_script( 'fcb-validation-js', 'FCB_validation',
+				array( 
+					'is_required' => __('Required','formcraft_basic'),
+					'min_char' => __('Min [min] characters required','formcraft_basic'),
+					'max_char' => __('Max [max] characters allowed','formcraft_basic'),
+					'allow_email' => __('Invalid email','formcraft_basic'),
+					'allow_alphabets' => __('Only alphabets allowed','formcraft_basic'),
+					'allow_numbers' => __('Only numbers allowed','formcraft_basic'),
+					'allow_alphanumeric' => __('Only alphabets and numbers allowed','formcraft_basic'),
+					)
+				);		wp_localize_script( 'fcb-form-js', 'FCB',
+				array( 
+					'ajaxurl' => admin_url( 'admin-ajax.php' ),
+					'datepickerLang' => plugins_url( 'assets/js/datepicker-lang/', __FILE__ )
+					)
+				);
+				if (strpos($_SERVER["REQUEST_URI"], '?preview=true'))
+				{
+					wp_enqueue_script('fcb-toastr-js', plugins_url( 'assets/js/toastr.min.js', __FILE__ ));
+				}
+				wp_enqueue_style('fcb-form-page-css', plugins_url( 'assets/css/form-page.css', __FILE__ ), array('fcb-main-css'), $fcb_meta['version']);
+			}
+		}
+
+		function formcraft_basic_shortcode( $atts ) {
+			global $fcb_meta, $forms_table, $wpdb;
+			wp_enqueue_script('fcb-tooltip-js', plugins_url( 'assets/js/tooltip.min.js', __FILE__ ), array('jquery')); 
+			wp_enqueue_script('fcb-form-js', plugins_url( 'assets/js/form.js', __FILE__ ), array('jquery', 'jquery-ui-core', 'jquery-ui-datepicker'), $fcb_meta['version']); 
+			wp_enqueue_script('fcb-validation-js', plugins_url( 'assets/js/formcraft-validation.js', __FILE__ )); 
+			wp_localize_script( 'fcb-form-js', 'FCB',
+				array( 
+					'ajaxurl' => admin_url( 'admin-ajax.php' ),
+					'datepickerLang' => plugins_url( 'assets/js/datepicker-lang/', __FILE__ )
+					)
+				);
 			if (strpos($_SERVER["REQUEST_URI"], '?preview=true'))
 			{
 				wp_enqueue_script('fcb-toastr-js', plugins_url( 'assets/js/toastr.min.js', __FILE__ ));
 			}
-			wp_enqueue_style('fcb-form-page-css', plugins_url( 'assets/css/form-page.css', __FILE__ ), array('fcb-main-css'), $fcb_version);
-		}
-	}
 
-	function formcraft_basic_shortcode( $atts ) {
-		global $fcb_version, $forms_table, $wpdb;
-		wp_enqueue_script('fcb-tooltip-js', plugins_url( 'assets/js/tooltip.min.js', __FILE__ ), array('jquery')); 
-		wp_enqueue_script('fcb-form-js', plugins_url( 'assets/js/form.js', __FILE__ ), array('jquery', 'jquery-ui-core', 'jquery-ui-datepicker'), $fcb_version); 
-		wp_enqueue_script('fcb-validation-js', plugins_url( 'assets/js/formcraft-validation.js', __FILE__ )); 
-		wp_localize_script( 'fcb-form-js', 'FCB',
-			array( 
-				'ajaxurl' => admin_url( 'admin-ajax.php' ),
-				'datepickerLang' => plugins_url( 'assets/js/datepicker-lang/', __FILE__ )
-				)
-			);
-		if (strpos($_SERVER["REQUEST_URI"], '?preview=true'))
-		{
-			wp_enqueue_script('fcb-toastr-js', plugins_url( 'assets/js/toastr.min.js', __FILE__ ));
-		}
+			extract( shortcode_atts( array(
+				'id' => '1',
+				'align' => 'left'
+				), $atts ) );
 
-		extract( shortcode_atts( array(
-			'id' => '1',
-			'align' => 'left'
-			), $atts ) );
-
-		if ( !ctype_digit($id) )
-		{
-			return '';
+			if ( !ctype_digit($id) )
+			{
+				return '';
+			}
+			$html = $wpdb->get_var( "SELECT html FROM $forms_table WHERE id='$id'" );
+			return "<div class='formcraft-css align-$align'>".stripcslashes($html)."</div>";
 		}
-		$html = $wpdb->get_var( "SELECT html FROM $forms_table WHERE id='$id'" );
-		return "<div class='formcraft-css align-$align'>".stripcslashes($html)."</div>";
-	}
-	add_shortcode( 'fcb', 'formcraft_basic_shortcode' );
+		add_shortcode( 'fcb', 'formcraft_basic_shortcode' );
 
 
 	/*
@@ -332,7 +309,8 @@ function formcraft_basic_check()
 	add_action( 'wp_ajax_formcraft_basic_new_form', 'formcraft_basic_new_form' );
 	function formcraft_basic_new_form()
 	{
-		global $wpdb, $forms_table;
+		global $wpdb, $fcb_meta, $forms_table;
+		if ( !current_user_can($fcb_meta['user_can']) ) { die(); }
 		if ( !isset($_POST['form_name']) || empty($_POST['form_name']) )
 		{
 			$response = array('failed'=>__('Name is required','formcraft_basic') );
@@ -404,7 +382,8 @@ function formcraft_basic_check()
 	add_action( 'wp_ajax_formcraft_form_data', 'formcraft_form_data' );
 	function formcraft_form_data()
 	{
-		global $wpdb, $forms_table;
+		global $wpdb, $forms_table, $fcb_meta;
+		if ( !current_user_can($fcb_meta['user_can']) ) { die(); }
 		$form_id = $_GET['id'];
 		if (!ctype_digit($form_id))
 		{
@@ -423,7 +402,8 @@ function formcraft_basic_check()
 	add_action( 'wp_ajax_formcraft_basic_del_submissions', 'formcraft_basic_del_submissions' );
 	function formcraft_basic_del_submissions()
 	{
-		global $fcb_version, $forms_table, $submissions_table, $wpdb;
+		global $fcb_meta, $forms_table, $submissions_table, $wpdb;
+		if ( !current_user_can($fcb_meta['user_can']) ) { die(); }
 		$list = explode(',',$_GET['list']);
 		$deleted = 0;
 		foreach ($list as $value) {
@@ -447,7 +427,8 @@ function formcraft_basic_check()
 	add_action( 'wp_ajax_formcraft_basic_del_form', 'formcraft_basic_del_form' );
 	function formcraft_basic_del_form()
 	{
-		global $fcb_version, $forms_table, $submissions_table, $wpdb;
+		global $fcb_meta, $forms_table, $submissions_table, $wpdb;
+		if ( !current_user_can($fcb_meta['user_can']) ) { die(); }
 		$form = $_GET['form'];
 		if ( !ctype_digit($form) ) { die(); }
 		$deleted = $wpdb->delete( $forms_table, array('id'=>$form) );
@@ -467,7 +448,8 @@ function formcraft_basic_check()
 	add_action( 'wp_ajax_formcraft_basic_get_submissions', 'formcraft_basic_get_submissions' );
 	function formcraft_basic_get_submissions()
 	{
-		global $fcb_version, $forms_table, $submissions_table, $wpdb;
+		global $fcb_meta, $forms_table, $submissions_table, $wpdb;
+		if ( !current_user_can($fcb_meta['user_can']) ) { die(); }
 		$page = isset($_POST['page']) && ctype_digit($_POST['page']) ? $_POST['page']-1 : 0;
 		$form = isset($_POST['form']) && ctype_digit($_POST['form']) ? $_POST['form'] : 0;
 		$per_page = 10;
@@ -502,7 +484,8 @@ function formcraft_basic_check()
 	add_action( 'wp_ajax_formcraft_basic_get_submission_content', 'formcraft_basic_get_submission_content' );
 	function formcraft_basic_get_submission_content()
 	{
-		global $fcb_version, $forms_table, $submissions_table, $wpdb;
+		global $fcb_meta, $forms_table, $submissions_table, $wpdb;
+		if ( !current_user_can($fcb_meta['user_can']) ) { die(); }
 		if ( !isset($_GET['id']) || !ctype_digit($_GET['id']) )
 		{
 			die();
@@ -525,7 +508,7 @@ function formcraft_basic_check()
 	add_action('wp_ajax_nopriv_formcraft_basic_form_submit', 'formcraft_basic_form_submit');
 	function formcraft_basic_form_submit()
 	{
-		global $fcb_version, $forms_table, $submissions_table, $wpdb;
+		global $fcb_meta, $forms_table, $submissions_table, $wpdb;
 		if ( !isset($_POST['id']) || !ctype_digit($_POST['id']) )
 		{
 			echo json_encode(array('failed'=> __('Invalid Form ID','formcraft_basic') ));
@@ -727,7 +710,8 @@ function formcraft_basic_check()
 	add_action( 'wp_ajax_formcraft_basic_form_save', 'formcraft_basic_form_save' );
 	function formcraft_basic_form_save()
 	{
-		global $wpdb, $forms_table;
+		global $wpdb, $fcb_meta, $forms_table;
+		if ( !current_user_can($fcb_meta['user_can']) ) { die(); }
 		$form_id = $_POST['id'];
 		if (!ctype_digit($form_id))
 		{
@@ -760,7 +744,8 @@ function formcraft_basic_check()
 	add_action( 'wp_ajax_formcraft_basic_import_file', 'formcraft_basic_import_file' );
 	function formcraft_basic_import_file()
 	{
-		global $wpdb;
+		global $wpdb, $fcb_meta;
+		if ( !current_user_can($fcb_meta['user_can']) ) { die(); }
 		if ( isset($_FILES['form_file']) )
 		{
 			if ( !isset($_FILES['form_file']['type']) || $_FILES['form_file']['type']!='text/plain' )
@@ -796,14 +781,14 @@ function formcraft_basic_check()
 	add_action('admin_menu', 'formcraft_basic_admin' );
 	function formcraft_basic_admin()
 	{
-		global $wp_version;
+		global $wp_version, $fcb_meta;
 		$icon_url = $wp_version >= 3.8 ? 'dashicons-list-view' : '';
-		add_menu_page( 'FormCraft Basic', 'FormCraft Basic', 'activate_plugins', 'formcraft_basic_dashboard', 'formcraft_basic_dashboard', $icon_url, '32.0505' );
+		add_menu_page( 'FormCraft Basic', 'FormCraft Basic', $fcb_meta['user_can'], 'formcraft_basic_dashboard', 'formcraft_basic_dashboard', $icon_url, '32.0505' );
 		add_action( 'admin_enqueue_scripts', 'formcraft_basic_admin_assets' );
 	}
 	function formcraft_basic_admin_assets($hook)
 	{
-		global $fcb_version;
+		global $fcb_meta;
 		if ($hook!='toplevel_page_formcraft_basic_dashboard') { return false; }
 
 		/* Basic Styles and Scripts */
@@ -812,9 +797,9 @@ function formcraft_basic_check()
 		wp_enqueue_script('fcb-modal-js', plugins_url( 'assets/js/fcbmodal.js', __FILE__ ));
 		wp_enqueue_script('fcb-toastr-js', plugins_url( 'assets/js/toastr.min.js', __FILE__ ));
 
-		wp_enqueue_style('fcb-common-css', plugins_url( 'assets/css/common-elements.css', __FILE__ ),array(), $fcb_version);  
-		wp_enqueue_style('fcb-modal-css', plugins_url( 'assets/css/fcbmodal.css', __FILE__ ),array(), $fcb_version);  
-		wp_enqueue_style('fcb-fontello-css', plugins_url( 'assets/fontello/css/fcb.css', __FILE__ ),array(), $fcb_version);  
+		wp_enqueue_style('fcb-common-css', plugins_url( 'assets/css/common-elements.css', __FILE__ ),array(), $fcb_meta['version']);  
+		wp_enqueue_style('fcb-modal-css', plugins_url( 'assets/css/fcbmodal.css', __FILE__ ),array(), $fcb_meta['version']);  
+		wp_enqueue_style('fcb-fontello-css', plugins_url( 'assets/fontello/css/fcb.css', __FILE__ ),array(), $fcb_meta['version']);  
 
 
 		/* Dashboard Styles and Scripts */
@@ -828,13 +813,13 @@ function formcraft_basic_check()
 				)
 			);
 
-		wp_enqueue_style('fcb-zurb-css', plugins_url( 'assets/css/foundation.min.css', __FILE__ ),array(), $fcb_version);
-		wp_enqueue_style('fcb-dashboard-css', plugins_url( 'assets/css/dashboard.css', __FILE__ ),array(), $fcb_version);
+		wp_enqueue_style('fcb-zurb-css', plugins_url( 'assets/css/foundation.min.css', __FILE__ ),array(), $fcb_meta['version']);
+		wp_enqueue_style('fcb-dashboard-css', plugins_url( 'assets/css/dashboard.css', __FILE__ ),array(), $fcb_meta['version']);
 
 
 		/* Builder Styles and Scripts */
 		wp_enqueue_style( 'wp-color-picker' );
-		wp_enqueue_style('fcb-main-css', plugins_url( 'assets/css/form.main.css', __FILE__ ),array(), $fcb_version);
+		wp_enqueue_style('fcb-main-css', plugins_url( 'assets/css/form.main.css', __FILE__ ),array(), $fcb_meta['version']);
 
 		wp_enqueue_script( 'wp-color-picker' );
 		wp_enqueue_script('fcb-angular-js', plugins_url( 'assets/js/angular.min.js', __FILE__ )); 

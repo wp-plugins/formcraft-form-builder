@@ -32,7 +32,7 @@ FormCraft is based on our 4th Gen form building platform, which is a complete re
 5. Get live email notifications on form submissions
 6. Export / Import form templates
 7. Lightweight and fast
-8. Form validation
+8. Form validation - front-end and back-end
 9. Translation-ready
 
 
@@ -99,6 +99,12 @@ It is currently not possible to accept files using FormCraft Basic. For advanced
 2. Drag-and-drop form editor mode
 
 == Changelog ==
+
+= 1.0.1 =
+* Restricted certain backend actions based on user roles
+* Fixed a bug where field options were uneditable if the form width was too high
+* Changed the interface of dragging fields
+* You can now edit a field by simply clicking on it
 
 = 1.0.0 =
 * Initial release

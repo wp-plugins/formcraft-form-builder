@@ -23,7 +23,7 @@ $total_forms = count($forms)==0 ? '0' : count($forms);
 	<div class='row'>
 		<div class='large-12 column fcb-brand-header'>
 			<h1>FormCraft <span>Basic</span></h1>
-			<p class='sub-header'> designed by <a target='_blank' href='http://ncrafts.net'>nCrafts</a></p>
+			<p class='sub-header'> designed by <a target='_blank' href='http://ncrafts.net?ref=formcraft_basic'>nCrafts</a></p>
 		</div>
 	</div>
 	<div class='row' style='position: relative; z-index: 101'>

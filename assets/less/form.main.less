@@ -496,6 +496,32 @@ body.wp-admin .fcbmodal
 		{
 			box-shadow: 0px 1px 2px #bbb;
 			-moz-box-shadow: 0px 1px 2px #bbb;
+			.form-element
+			{
+				opacity: .7;
+				transition: none;
+			    -webkit-transition: none;
+			}
+			.form-element .options-panel
+			{
+				display: none;
+				cursor: move;
+			}
+			.form-element:hover .options-panel
+			{
+				display: block;
+			}
+			.form-element:hover
+			{
+				//box-shadow: 0px 0px 100px rgba(0,0,0,.05) inset;
+				border: 1px dashed #aaa;
+				border-radius: 2px;
+				opacity: 1;
+			}
+			.form-element.options-true
+			{
+				opacity: 1;
+			}
 		}
 		.required_field
 		{
@@ -591,13 +617,14 @@ body.wp-admin .fcbmodal
 	{
 		text-align: center;
 		position: relative;
+		min-width: 100%;
 		> form
 		{
 			margin: 0 auto;
 		}
 		.form-element
 		{
-			cursor: move;
+			
 		}
 		.no-fields
 		{
@@ -639,11 +666,9 @@ body.wp-admin .fcbmodal
 		transition: width .2s;
 		-webkit-transition: width .2s;
 		letter-spacing: -4px;
-		padding-right: 20px;
-		padding-bottom: 20px;
+		padding: 10px;
 		text-align: left;
 		margin: 0 auto;
-		max-width: 100%;
 		min-width: 140px;
 		box-sizing: border-box;
 		-moz-box-sizing: border-box;
@@ -745,14 +770,11 @@ body.wp-admin .fcbmodal
 		}
 		.form-element.ng-enter
 		{
-			-webkit-animation: fadeIns .25s;
-			animation: fadeIns .25s;
+
 		}
 		.form-element.ng-leave
 		{
 			display: none;
-			-webkit-animation: fadeOuts .25s;
-			animation: fadeOuts .25s;
 			.form-options
 			{
 				display: none;
@@ -773,18 +795,17 @@ body.wp-admin .fcbmodal
 			margin: 0;
 			min-height: 52px;
 			position: relative;
-			margin-left: 20px;
 		}
 		.dndPlaceholder:before
 		{
 			content: '';
-			border: 2px dashed #bbb;
+			border: 1px dashed #aaa;
 			border-radius: 2px;
 			position: absolute;
-			left: 0;
-			right: 0;
+			left: 0px;
+			right: 0px;
 			bottom: 0px;
-			top: 20px;
+			top: 0px;
 		}
 		.final-success
 		{
@@ -837,6 +858,8 @@ body.wp-admin .fcbmodal
 			transition: opacity .4s, transform .7s;
 			-webkit-transition: opacity .4s, -webkit-transform .7s;
 			opacity: 1;
+			border: 1px dashed transparent;
+			border-radius: 2px;
 			&.error-field
 			{
 				.error
@@ -884,7 +907,7 @@ body.wp-admin .fcbmodal
 			{
 				display: none;
 				position: absolute;
-				top: 20px;
+				top: 10px;
 				z-index: 101;
 				font-size: .85em;
 				line-height: .4em;
@@ -897,7 +920,7 @@ body.wp-admin .fcbmodal
 			}
 			.form-element-html
 			{
-				padding: 20px 0 0 20px;
+				padding: 10px;
 			}
 			.field-cover
 			{
@@ -1137,7 +1160,7 @@ body.wp-admin .fcbmodal
 			width: 330px;
 			box-shadow: 0 0px 2px #aaa;
 			-webkit-box-shadow: 0 0px 2px #aaa;
-			top: 0;
+			top: -10px;
 			background: white;
 			border-radius: 2px;
 			.align-icons > label
@@ -1293,44 +1316,19 @@ body.wp-admin .fcbmodal
 				}
 			}
 		}
-		.options-true .options-panel
-		{
-			border-color: #FFAE19;
-			background: #FFAE19;
-			color: white;
-			.icon-minus
-			{
-				display: block;
-			}
-			.icon-pencil
-			{
-				display: none;
-			}
-		}
-		.options-false .options-panel
-		{
-			.icon-minus
-			{
-				display: none;
-			}
-			.icon-pencil
-			{
-				display: block;
-			}
-		}
 		.form-options.ng-hide
 		{
 			display: none;
 		}
 		.even .form-options
 		{
-			right: -20px;
-			margin-right: -370px;
+			right: 0;
+			margin-right: -352px;
 		}
 		.odd .form-options
 		{
 			left: 0;
-			margin-left: -370px;
+			margin-left: -352px;
 		}
 		.odd .form-options
 		{
@@ -1360,18 +1358,21 @@ body.wp-admin .fcbmodal
 		{
 			position: absolute;
 			cursor: pointer;
-			left: -29px;
-			top: 30px;
+			left: -10px;
+			top: 50%;
+			font-size: 13px;
+			padding: 1px 1px;
+			margin-top: -10px;
 			z-index: 101;
-			color: #14ad14;
+			color: #fff;
 			border-radius: 100px;
-			border: 1px solid #14ad14;
+			//background-color: #eee;
+			//border: 1px solid #ccc;
+			background-color: #aaa;
 		}
-		.even .options-panel
+		.icon-move
 		{
-			right: -29px;
-			margin-right: -20px;
-			left: auto;
+
 		}
 	}
 }
@@ -1391,6 +1392,7 @@ body.wp-admin .fcbmodal
 	}
 	.fcb_form
 	{
+		max-width: 100%;
 		.options-panel,
 		.form-options
 		{

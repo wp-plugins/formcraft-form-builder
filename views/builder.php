@@ -39,11 +39,11 @@ $qry = $wpdb->get_results( "SELECT * FROM $forms_table WHERE id = '$form_id'" );
 		</div>
 		<div class='form-cover-builder hide-form'>
 			<span class='fcb-spinner fcb-spinner-form small'><div class='bounce1'></div><div class='bounce2'></div><div class='bounce3'></div></span>
-			<div id='form-cover-html' class='nos-{{Builder.FormElements.length}}'>
+			<div id='form-cover-html' class='nos-{{Builder.FormElements.length}}' style='width: {{Builder.form_width_nos}}px'>
 				<!--RFH-->
 				<div class='no-fields' ng-click='Options.show_fields = true'><?php _e('+ Add a Field','formcraft_basic'); ?></div>
 				<div style='width: {{Builder.form_width}}' class='form_width_change'><span><?php _e('Width','formcraft_basic') ?></span><input ng-model='Builder.form_width' type='text'/><i data-html='true' data-toggle='tooltip' title='<?php _e('You should use a value like <Strong>300px</strong>, or <Strong>420px</strong> here.<br>You can also define a %-based width, like <strong>50%</strong>, which will set the width of the form to 50% the width of its container. ','formcraft_basic') ?>' class='icon-help'></i></div>
-				<!--RTH--><form ondrop="drop(event)" ondragover="allowDrop(event)" dnd-list='Builder.FormElements' data-id='<?php echo $form_id; ?>' class='fcb_form align-{{Builder.form_align}} frame-{{Builder.form_frame}}' style='width: {{Builder.form_width}}; background-color: {{Builder.form_background}}; color: {{Builder.font_color}}; font-size: {{Builder.font_size}}%'><div ng-class-odd="'odd'" ng-class='["form-element", "form-element-"+element.elementDefaults.identifier, "options-"+element.show_options, "index-"+element.show_options]' ng-class-even="'even'" ng-repeat='element in Builder.FormElements' index='{{$index}}' style='width: {{element.elementDefaults.field_width}}'><span class='error'></span><div ondragstart="dragStart(event)" dnd-draggable='element' ondrag="setHeight(event)" dnd-moved='Builder.FormElements.splice($index, 1)' class='form-element-html' compile='element.element'></div><!--RFH--><span class='options-panel'><i ng-click='element.show_options = !element.show_options' class='icon-pencil'></i><i ng-click='element.show_options = !element.show_options' class='icon-minus'></i></span><div ng-show='element.show_options' class='form-options'><div class='sub-options'><div title='Field ID'>{{element.elementDefaults.identifier}}</div><span title='Delete Field' ng-click='removeFormElement($index)' class='delete'><i class='icon-trash-1'></i></span><span title='Duplicate Field' ng-click='duplicateFormElement($index)' class='duplicate'><i class='icon-docs'></i></span></div><div class='options-main' compile='element.elementOptions'></div></div><!--RTH--></div></form>
+				<!--RTH--><form ondrop="drop(event)" ondragover="allowDrop(event)" dnd-list='Builder.FormElements' data-id='<?php echo $form_id; ?>' class='fcb_form align-{{Builder.form_align}} frame-{{Builder.form_frame}}' style='width: {{Builder.form_width}}; background-color: {{Builder.form_background}}; color: {{Builder.font_color}}; font-size: {{Builder.font_size}}%'><div ng-class-odd="'odd'" ng-class='["form-element", "form-element-"+element.elementDefaults.identifier, "options-"+element.show_options, "index-"+element.show_options]' ng-class-even="'even'" ng-repeat='element in Builder.FormElements' index='{{$index}}' style='width: {{element.elementDefaults.field_width}}'><span class='error'></span><div ng-click='element.show_options = !element.show_options' class='form-element-html' compile='element.element'></div><!--RFH--><span class='options-panel' ondragstart="dragStart(event)" dnd-draggable='element' ondrag="setHeight(event)" dnd-moved='Builder.FormElements.splice($index, 1)'><i class='icon-move'></i></span><div ng-show='element.show_options' class='form-options'><div class='sub-options'><div title='Field ID'>{{element.elementDefaults.identifier}}</div><span title='Delete Field' ng-click='removeFormElement($index)' class='delete'><i class='icon-trash-1'></i></span><span title='Duplicate Field' ng-click='duplicateFormElement($index)' class='duplicate'><i class='icon-docs'></i></span></div><div class='options-main' compile='element.elementOptions'></div></div><!--RTH--></div></form>
 			</div>
 		</div>
 
@@ -105,7 +105,7 @@ $qry = $wpdb->get_results( "SELECT * FROM $forms_table WHERE id = '$form_id'" );
 									</h2>
 									<div>
 										<span class='option-label'><?php _e('From Email','formcraft_basic'); ?></span>
-										<input type="text" placeholder="sender@example.com" ng-model='Builder.Config.Email.email_from' style='width: 300px'>
+										<input type="text" placeholder="john@example.com" ng-model='Builder.Config.Email.email_from' style='width: 300px'>
 										<span class='tooltip-cover'><i data-html='true' class='icon-help tooltip-icon' data-toggle='tooltip' title='This will set the From Email address for the email notifications.<br>You can use an email here, like joe@example.com, or you can populate this with a form value, using the field ID:<br><strong>[field2]</strong>'></i></span>
 									</div>
 									<div>
@@ -115,8 +115,8 @@ $qry = $wpdb->get_results( "SELECT * FROM $forms_table WHERE id = '$form_id'" );
 									</div>
 									<div>
 										<span class='option-label'><?php _e('Email Subject','formcraft_basic'); ?></span>
-										<input type="text" placeholder="John Doe" ng-model='Builder.Config.Email.subject' style='width: 300px'>
-										<span class='tooltip-cover'><i data-html='true' class='icon-help tooltip-icon' data-toggle='tooltip' title='You can use form values here, using the field ID: <strong>[field1]</strong>'></i></span>
+										<input type="text" placeholder="New Form Submission" ng-model='Builder.Config.Email.subject' style='width: 300px'>
+										<span class='tooltip-cover'><i data-html='true' class='icon-help tooltip-icon' data-toggle='tooltip' title='You can use form values here, using their field ID: <strong>[field1]</strong>'></i></span>
 									</div>
 								</div>
 							</div>
