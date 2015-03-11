@@ -4,8 +4,8 @@
 	Plugin Name: FormCraft Basic
 	Plugin URI: http://ncrafts.net/
 	Description: A beautiful and simple drag-and-drop WordPress form builder
-	Author: Nishant
-	Author URI: https://twitter.com/nish_crafts
+	Author: nCrafts
+	Author URI: http://ncrafts.net
 	Version: 1.0.1
 	Text Domain: formcraft_basic
 	*/
