@@ -100,6 +100,9 @@ It is currently not possible to accept files using FormCraft Basic. For advanced
 
 == Changelog ==
 
+= 1.0.2 =
+* Fixed for an icon-conflict issue
+
 = 1.0.1 =
 * Restricted certain backend actions based on user roles
 * Fixed a bug where field options were uneditable if the form width was too high

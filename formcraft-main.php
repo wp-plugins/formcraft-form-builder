@@ -6,7 +6,7 @@
 	Description: A beautiful and simple drag-and-drop WordPress form builder
 	Author: nCrafts
 	Author URI: http://ncrafts.net
-	Version: 1.0.1
+	Version: 1.0.2
 	Text Domain: formcraft_basic
 	*/
 
