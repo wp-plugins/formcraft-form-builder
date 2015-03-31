@@ -6,7 +6,7 @@
 	Description: A beautiful and simple drag-and-drop WordPress form builder
 	Author: nCrafts
 	Author URI: http://ncrafts.net
-	Version: 1.0.2
+	Version: 1.0.3
 	Text Domain: formcraft_basic
 	*/
 
@@ -258,7 +258,8 @@
 					'allow_numbers' => __('Only numbers allowed','formcraft_basic'),
 					'allow_alphanumeric' => __('Only alphabets and numbers allowed','formcraft_basic'),
 					)
-				);		wp_localize_script( 'fcb-form-js', 'FCB',
+				);
+			wp_localize_script( 'fcb-form-js', 'FCB',
 				array( 
 					'ajaxurl' => admin_url( 'admin-ajax.php' ),
 					'datepickerLang' => plugins_url( 'assets/js/datepicker-lang/', __FILE__ )
@@ -276,7 +277,18 @@
 			global $fcb_meta, $forms_table, $wpdb;
 			wp_enqueue_script('fcb-tooltip-js', plugins_url( 'assets/js/tooltip.min.js', __FILE__ ), array('jquery')); 
 			wp_enqueue_script('fcb-form-js', plugins_url( 'assets/js/form.js', __FILE__ ), array('jquery', 'jquery-ui-core', 'jquery-ui-datepicker'), $fcb_meta['version']); 
-			wp_enqueue_script('fcb-validation-js', plugins_url( 'assets/js/formcraft-validation.js', __FILE__ )); 
+			wp_enqueue_script('fcb-validation-js', plugins_url( 'assets/js/formcraft-validation.js', __FILE__ ));
+			wp_localize_script( 'fcb-validation-js', 'FCB_validation',
+				array( 
+					'is_required' => __('Required','formcraft_basic'),
+					'min_char' => __('Min [min] characters required','formcraft_basic'),
+					'max_char' => __('Max [max] characters allowed','formcraft_basic'),
+					'allow_email' => __('Invalid email','formcraft_basic'),
+					'allow_alphabets' => __('Only alphabets allowed','formcraft_basic'),
+					'allow_numbers' => __('Only numbers allowed','formcraft_basic'),
+					'allow_alphanumeric' => __('Only alphabets and numbers allowed','formcraft_basic'),
+					)
+				);			
 			wp_localize_script( 'fcb-form-js', 'FCB',
 				array( 
 					'ajaxurl' => admin_url( 'admin-ajax.php' ),
