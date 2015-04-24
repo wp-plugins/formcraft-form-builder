@@ -6,7 +6,7 @@
 	Description: A beautiful and simple drag-and-drop WordPress form builder
 	Author: nCrafts
 	Author URI: http://ncrafts.net
-	Version: 1.0.3
+	Version: 1.0.4
 	Text Domain: formcraft_basic
 	*/
 
@@ -541,7 +541,7 @@
 			$value = isset($_POST[$field['identifier']]) ? $_POST[$field['identifier']] : '';
 
 			/* Check if Required Field */
-			if ( isset($field['elementDefaults']['required']) && $field['elementDefaults']['required']==true && trim($value)=='' )
+			if ( isset($field['elementDefaults']['required']) && $field['elementDefaults']['required']==true && empty($value) )
 			{
 				$errors['errors'][$field['identifier']] = __('Required','formcraft_basic');
 			}

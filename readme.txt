@@ -2,7 +2,7 @@
 Contributors: nish@ncrafts.net
 Tags: contact form builder, form builder, contact form 7, form, forms, widget, contact form, feedback form builder, email form builder, ajax form builder, captcha, file upload, newsletter form, customer support form builder, drag and drop form builder, lead generation form builder, event planner form builder, survey form builder
 Requires at least: 3.6
-Tested up to: 4.1
+Tested up to: 4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -99,6 +99,9 @@ It is currently not possible to accept files using FormCraft Basic. For advanced
 2. Drag-and-drop form editor mode
 
 == Changelog ==
+
+= 1.0.4 =
+* Fixed an issue which threw a PHP warning, and muddled up the form response
 
 = 1.0.3 =
 * Fixed a javascript conflict issue
