@@ -46,7 +46,7 @@ If you like FormCraft Basic, you might want to give our premium offering a try. 
 1. Conditional Logic
 2. Math logic for making order forms, quizzes
 3. Auto-save form progress
-4. Over 20+ form fields, including special fields like star rating, sliders, emoticon rating, matrix, etc ...
+4. Over 20+ form fields, including special fields like star rating, sliders, matrix, etc ...
 5. Accept multiple files uploads using the forms
 6. Integrations for popular services like MailChimp, GetResponse, Campaign Monitor, Aweber
 7. Embed popup forms, fly-in forms, or sticky-button forms on your site
@@ -55,8 +55,10 @@ If you like FormCraft Basic, you might want to give our premium offering a try. 
 10. Send customized auto-responders to your users
 11. Get form analytics in your WordPress dashboard
 12. Comprehensive online documentation, and one-on-one support
+13. Support for one-click checkout, through Stripe
+14. Dozens of add-ons, like multi-page forms, user registration, form to post, etc ...
 
-Try out [FormCraft Premium Form Builder](http://codecanyon.net/item/formcraft-premium-wordpress-form-builder/5335056?ref=ncrafts)
+Try out [FormCraft Premium Form Builder](http://formcraft-wp.com)
 
 
 == Frequently Asked Questions ==
