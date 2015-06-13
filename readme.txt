@@ -102,6 +102,11 @@ It is currently not possible to accept files using FormCraft Basic. For advanced
 
 == Changelog ==
 
+= 1.0.5 =
+* Fixed PHP warnings on plugin activate
+* Minor CSS updates
+* Fixed links
+
 = 1.0.4 =
 * Fixed an issue which threw a PHP warning, and muddled up the form response
 
