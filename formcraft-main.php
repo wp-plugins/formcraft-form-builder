@@ -6,12 +6,12 @@
 	Description: A beautiful and simple drag-and-drop WordPress form builder
 	Author: nCrafts
 	Author URI: http://ncrafts.net
-	Version: 1.0.4
+	Version: 1.0.5
 	Text Domain: formcraft_basic
 	*/
 
 	global $fcb_meta, $forms_table, $submissions_table, $views_table, $wpdb;
-	$fcb_meta['version'] = 1;
+	$fcb_meta['version'] = '1.0.5';
 	$fcb_meta['user_can'] = 'activate_plugins';
 	$forms_table = $wpdb->prefix . "formcraft_b_forms";
 	$submissions_table = $wpdb->prefix . "formcraft_b_submissions";
@@ -25,14 +25,30 @@
 		global $fcb_meta, $forms_table, $submissions_table, $views_table, $wpdb;
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 		$charset_collate = $wpdb->get_charset_collate();
-		$sql = "CREATE TABLE $forms_table (id mediumint(9) NOT NULL AUTO_INCREMENT,counter INT NOT NULL,name tinytext NOT NULL,created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,modified datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,html MEDIUMTEXT NULL,builder MEDIUMTEXT NULL,meta_builder MEDIUMTEXT NULL,UNIQUE KEY id (id)) $charset_collate;";
-		dbDelta( $sql );
-		$sql = "CREATE TABLE $submissions_table (id mediumint(9) NOT NULL AUTO_INCREMENT,form INT NOT NULL,form_name tinytext NOT NULL,created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,content MEDIUMTEXT NULL,visitor MEDIUMTEXT NULL,UNIQUE KEY id (id)) $charset_collate;";
-		dbDelta( $sql );
-		$sql = "CREATE TABLE $views_table (id mediumint(9) NOT NULL AUTO_INCREMENT,form INT NOT NULL,views INT NOT NULL,views_date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,UNIQUE KEY id (id)) $charset_collate;";
-		dbDelta( $sql );
+		if($wpdb->get_var("SHOW TABLES LIKE '$forms_table'") != $forms_table) {
+			$sql = "CREATE TABLE $forms_table (id mediumint(9) NOT NULL AUTO_INCREMENT,counter INT NOT NULL,name tinytext NOT NULL,created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,modified datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,html MEDIUMTEXT NULL,builder MEDIUMTEXT NULL,meta_builder MEDIUMTEXT NULL,UNIQUE KEY id (id)) $charset_collate;";
+			dbDelta( $sql );
+		}
+
+		if($wpdb->get_var("SHOW TABLES LIKE '$submissions_table'") != $submissions_table) {
+			$sql = "CREATE TABLE $submissions_table (id mediumint(9) NOT NULL AUTO_INCREMENT,form INT NOT NULL,form_name tinytext NOT NULL,created datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,content MEDIUMTEXT NULL,visitor MEDIUMTEXT NULL,UNIQUE KEY id (id)) $charset_collate;";
+			dbDelta( $sql );
+		}
+
+		if($wpdb->get_var("SHOW TABLES LIKE '$views_table'") != $views_table) {
+			$sql = "CREATE TABLE $views_table (id mediumint(9) NOT NULL AUTO_INCREMENT,form INT NOT NULL,views INT NOT NULL,views_date datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,UNIQUE KEY id (id)) $charset_collate;";
+			dbDelta( $sql );
+		}
 	}
 	register_activation_hook( __FILE__, 'formcraft_basic_activate' );
+
+	/* FormCraft icon */
+	add_action( 'admin_enqueue_scripts', 'formcraft_basic_admin_scripts' );
+	function formcraft_basic_admin_scripts()
+	{
+		global $fc_meta, $fc_forms_table, $wpdb;
+		wp_enqueue_style('fcb-icon-css', plugins_url( 'assets/formcraft-icon.css', __FILE__ ),array(), $fc_meta['version']);
+	}
 
 
 	/* Check if the User is Visiting a Form Page */
@@ -265,54 +281,54 @@
 					'datepickerLang' => plugins_url( 'assets/js/datepicker-lang/', __FILE__ )
 					)
 				);
-				if (strpos($_SERVER["REQUEST_URI"], '?preview=true'))
-				{
-					wp_enqueue_script('fcb-toastr-js', plugins_url( 'assets/js/toastr.min.js', __FILE__ ));
-				}
-				wp_enqueue_style('fcb-form-page-css', plugins_url( 'assets/css/form-page.css', __FILE__ ), array('fcb-main-css'), $fcb_meta['version']);
-			}
-		}
-
-		function formcraft_basic_shortcode( $atts ) {
-			global $fcb_meta, $forms_table, $wpdb;
-			wp_enqueue_script('fcb-tooltip-js', plugins_url( 'assets/js/tooltip.min.js', __FILE__ ), array('jquery')); 
-			wp_enqueue_script('fcb-form-js', plugins_url( 'assets/js/form.js', __FILE__ ), array('jquery', 'jquery-ui-core', 'jquery-ui-datepicker'), $fcb_meta['version']); 
-			wp_enqueue_script('fcb-validation-js', plugins_url( 'assets/js/formcraft-validation.js', __FILE__ ));
-			wp_localize_script( 'fcb-validation-js', 'FCB_validation',
-				array( 
-					'is_required' => __('Required','formcraft_basic'),
-					'min_char' => __('Min [min] characters required','formcraft_basic'),
-					'max_char' => __('Max [max] characters allowed','formcraft_basic'),
-					'allow_email' => __('Invalid email','formcraft_basic'),
-					'allow_alphabets' => __('Only alphabets allowed','formcraft_basic'),
-					'allow_numbers' => __('Only numbers allowed','formcraft_basic'),
-					'allow_alphanumeric' => __('Only alphabets and numbers allowed','formcraft_basic'),
-					)
-				);			
-			wp_localize_script( 'fcb-form-js', 'FCB',
-				array( 
-					'ajaxurl' => admin_url( 'admin-ajax.php' ),
-					'datepickerLang' => plugins_url( 'assets/js/datepicker-lang/', __FILE__ )
-					)
-				);
 			if (strpos($_SERVER["REQUEST_URI"], '?preview=true'))
 			{
 				wp_enqueue_script('fcb-toastr-js', plugins_url( 'assets/js/toastr.min.js', __FILE__ ));
 			}
-
-			extract( shortcode_atts( array(
-				'id' => '1',
-				'align' => 'left'
-				), $atts ) );
-
-			if ( !ctype_digit($id) )
-			{
-				return '';
-			}
-			$html = $wpdb->get_var( "SELECT html FROM $forms_table WHERE id='$id'" );
-			return "<div class='formcraft-css align-$align'>".stripcslashes($html)."</div>";
+			wp_enqueue_style('fcb-form-page-css', plugins_url( 'assets/css/form-page.css', __FILE__ ), array('fcb-main-css'), $fcb_meta['version']);
 		}
-		add_shortcode( 'fcb', 'formcraft_basic_shortcode' );
+	}
+
+	function formcraft_basic_shortcode( $atts ) {
+		global $fcb_meta, $forms_table, $wpdb;
+		wp_enqueue_script('fcb-tooltip-js', plugins_url( 'assets/js/tooltip.min.js', __FILE__ ), array('jquery')); 
+		wp_enqueue_script('fcb-form-js', plugins_url( 'assets/js/form.js', __FILE__ ), array('jquery', 'jquery-ui-core', 'jquery-ui-datepicker'), $fcb_meta['version']); 
+		wp_enqueue_script('fcb-validation-js', plugins_url( 'assets/js/formcraft-validation.js', __FILE__ ));
+		wp_localize_script( 'fcb-validation-js', 'FCB_validation',
+			array( 
+				'is_required' => __('Required','formcraft_basic'),
+				'min_char' => __('Min [min] characters required','formcraft_basic'),
+				'max_char' => __('Max [max] characters allowed','formcraft_basic'),
+				'allow_email' => __('Invalid email','formcraft_basic'),
+				'allow_alphabets' => __('Only alphabets allowed','formcraft_basic'),
+				'allow_numbers' => __('Only numbers allowed','formcraft_basic'),
+				'allow_alphanumeric' => __('Only alphabets and numbers allowed','formcraft_basic'),
+				)
+			);			
+		wp_localize_script( 'fcb-form-js', 'FCB',
+			array( 
+				'ajaxurl' => admin_url( 'admin-ajax.php' ),
+				'datepickerLang' => plugins_url( 'assets/js/datepicker-lang/', __FILE__ )
+				)
+			);
+		if (strpos($_SERVER["REQUEST_URI"], '?preview=true'))
+		{
+			wp_enqueue_script('fcb-toastr-js', plugins_url( 'assets/js/toastr.min.js', __FILE__ ));
+		}
+
+		extract( shortcode_atts( array(
+			'id' => '1',
+			'align' => 'left'
+			), $atts ) );
+
+		if ( !ctype_digit($id) )
+		{
+			return '';
+		}
+		$html = $wpdb->get_var( "SELECT html FROM $forms_table WHERE id='$id'" );
+		return "<div class='formcraft-css align-$align'>".stripcslashes($html)."</div>";
+	}
+	add_shortcode( 'fcb', 'formcraft_basic_shortcode' );
 
 
 	/*
